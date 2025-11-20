@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import content from '../data/content.json'
 
 export default function StickyBar() {
   const [open, setOpen] = useState(false)
+  const [musicPlaying, setMusicPlaying] = useState(false)
+  const [tipVisible, setTipVisible] = useState(false)
   const copyLink = async () => {
     try {
       if (navigator.share) {
@@ -23,6 +25,41 @@ export default function StickyBar() {
     const el = document.querySelector('#wishbook-section')
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
+  const toggleMusic = () => {
+    const a = document.getElementById('wedding-audio')
+    if (!a) return
+    if (!a.paused) { a.pause(); try { localStorage.setItem('wedding_audio_userPaused', '1') } catch {} }
+    else { a.play().catch(()=>{}); try { localStorage.setItem('wedding_audio_userPaused', '0') } catch {} }
+    setTipVisible(false)
+  }
+  useEffect(() => {
+    const a = document.getElementById('wedding-audio')
+    if (!a) return
+    const sync = () => setMusicPlaying(!a.paused)
+    sync()
+    a.addEventListener('play', sync)
+    a.addEventListener('pause', sync)
+    const KEY = 'wedding_audio_userPaused'
+    const userPaused = () => { try { return localStorage.getItem(KEY) === '1' } catch { return false } }
+    const maybeShowTip = () => {
+      if (userPaused()) return
+      const need = a.paused || a.muted
+      if (need) {
+        setTipVisible(true)
+        setTimeout(() => setTipVisible(false), 5000)
+      }
+    }
+    const hideTip = () => setTipVisible(false)
+    a.addEventListener('playing', hideTip)
+    a.addEventListener('volumechange', hideTip)
+    maybeShowTip()
+    return () => {
+      a.removeEventListener('play', sync)
+      a.removeEventListener('pause', sync)
+      a.removeEventListener('playing', hideTip)
+      a.removeEventListener('volumechange', hideTip)
+    }
+  }, [])
   return (
     <>
       <div className={`floating-actions ${open ? 'open' : ''}`}>
@@ -45,7 +82,17 @@ export default function StickyBar() {
         </button>
       </div>
       <div className="floating-left">
-        <button className="fab" aria-label="Gửi lời chúc" onClick={openWish}>💌</button>
+        {tipVisible && (
+          <div className="tooltip">👉 Click vào đây để phát nhạc</div>
+        )}
+        <button className={`fab ${musicPlaying ? 'playing' : ''}`} aria-label={musicPlaying ? 'Tạm dừng nhạc' : 'Phát nhạc'} onClick={toggleMusic}>
+          <img
+            src={musicPlaying ? '/assets/icons/play-music.png' : '/assets/icons/pause-music.png'}
+            alt={musicPlaying ? 'Đang phát' : 'Tạm dừng'}
+            className={`w-full h-full rounded-full ${musicPlaying ? 'spin' : ''}`}
+            onError={(e) => { e.currentTarget.src = '/assets/icons/website-ic.png' }}
+          />
+        </button>
       </div>
     </>
   )
