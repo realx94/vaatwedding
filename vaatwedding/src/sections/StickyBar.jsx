@@ -6,7 +6,7 @@ export default function StickyBar() {
   const copyLink = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: document.title, text: 'Thiệp cưới Bustle VIP', url: window.location.href })
+        await navigator.share({ title: document.title, text: 'Anh Tuấn & Vân Anh wedding', url: window.location.href })
         return
       }
       await navigator.clipboard.writeText(window.location.href)
