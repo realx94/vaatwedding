@@ -24,8 +24,9 @@ function addToCalendar(e) {
 }
 
 function openDirections(e) {
-  const parts = [e.title, e.location, e.host].filter(Boolean)
-  const q = encodeURIComponent(parts.join(', '))
+  const qRaw = e.location || e.title || ''
+  if (!qRaw) return alert('Chưa có địa chỉ để mở bản đồ')
+  const q = encodeURIComponent(qRaw)
   const url = `https://www.google.com/maps/search/?api=1&query=${q}`
   window.open(url, '_blank')
 }

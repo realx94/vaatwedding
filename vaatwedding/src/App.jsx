@@ -29,10 +29,10 @@ export default function App() {
     let raf
     let running = false
     let last = 0
-    let inviteTimer
+    let disabled = false
     const velocity = 70
     const start = () => {
-      if (running) return
+      if (running || disabled) return
       running = true
       last = performance.now()
       const tick = (ts) => {
@@ -41,12 +41,13 @@ export default function App() {
         const dt = Math.max(0, (ts - last) / 1000)
         last = ts
         const maxH = Math.max(document.documentElement.scrollHeight || 0, document.body.scrollHeight || 0)
-        const y = Math.min(maxH - window.innerHeight, window.scrollY + velocity * dt)
-        if (window.scrollY + window.innerHeight >= maxH - 1) {
-          window.scrollTo({ top: 0 })
-        } else {
-          window.scrollTo({ top: y })
+        const atBottom = window.scrollY + window.innerHeight >= maxH - 1
+        if (atBottom) {
+          stop()
+          return
         }
+        const y = Math.min(maxH - window.innerHeight, window.scrollY + velocity * dt)
+        window.scrollTo({ top: y })
         raf = requestAnimationFrame(tick)
       }
       raf = requestAnimationFrame(tick)
@@ -56,46 +57,67 @@ export default function App() {
       try { cancelAnimationFrame(raf) } catch {}
     }
     const resetIdle = () => {
+      if (disabled) return
       clearTimeout(idleTimer)
-      idleTimer = setTimeout(() => { start(); resetIdle() }, 30000)
+      idleTimer = setTimeout(() => { if (!disabled) start(); resetIdle() }, 30000)
     }
-    const onStop = () => { stop(); resetIdle(); scheduleInvite() }
-    const onReset = () => { resetIdle(); scheduleInvite() }
-    const scheduleInvite = () => {
-      clearTimeout(inviteTimer)
-      inviteTimer = setTimeout(() => setShowInvite(true), 5000)
-    }
+    const onStop = () => { stop(); resetIdle() }
+    const onReset = () => { resetIdle() }
+    const disableAuto = () => { disabled = true; stop(); clearTimeout(idleTimer); clearTimeout(initialTimer) }
+    const enableAuto = () => { disabled = false; resetIdle() }
     const stopEvents = ['mousedown','click','touchstart']
     const resetEvents = ['mousemove','wheel','touchmove','keydown','scroll']
-    const inviteResetEvents = ['mousemove','wheel','touchmove','keydown','click','touchstart']
     stopEvents.forEach(ev => window.addEventListener(ev, onStop, { passive: true }))
     resetEvents.forEach(ev => window.addEventListener(ev, onReset, { passive: true }))
-    inviteResetEvents.forEach(ev => window.addEventListener(ev, scheduleInvite, { passive: true }))
-    initialTimer = setTimeout(() => { start(); resetIdle() }, 5000)
+    window.addEventListener('vaat_disable_autoscroll', disableAuto)
+    window.addEventListener('vaat_enable_autoscroll', enableAuto)
+    initialTimer = setTimeout(() => { if (!disabled) { start(); resetIdle() } }, 5000)
     resetIdle()
-    scheduleInvite()
     return () => {
       stop()
       clearTimeout(idleTimer)
       clearTimeout(initialTimer)
-      clearTimeout(inviteTimer)
       try {
         stopEvents.forEach(ev => window.removeEventListener(ev, onStop))
         resetEvents.forEach(ev => window.removeEventListener(ev, onReset))
-        inviteResetEvents.forEach(ev => window.removeEventListener(ev, scheduleInvite))
+        window.removeEventListener('vaat_disable_autoscroll', disableAuto)
+        window.removeEventListener('vaat_enable_autoscroll', enableAuto)
       } catch {}
     }
   }, [])
+
+  useEffect(() => {
+    try {
+      const KEY = 'vaatwedding_invite_shown'
+      const shown = localStorage.getItem(KEY)
+      if (shown) return
+      const timer = setTimeout(() => {
+        try { localStorage.setItem(KEY, '1') } catch {}
+        setShowInvite(true)
+      }, 30000)
+      return () => clearTimeout(timer)
+    } catch {
+      const timer = setTimeout(() => setShowInvite(true), 30000)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      const ev = new Event(showInvite ? 'vaat_disable_autoscroll' : 'vaat_enable_autoscroll')
+      window.dispatchEvent(ev)
+    } catch {}
+  }, [showInvite])
   return (
     <div>
       {showInvite && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="card p-6" style={{ maxWidth: 420, width: '90%' }}>
-            <h3 className="font-heading text-primary-700 text-2xl">Bạn sẽ tham gia chứ?</h3>
-            <p className="mt-2 text-gray-700">Vui lòng xác nhận tham dự để chúng mình chuẩn bị chu đáo.</p>
-            <div className="mt-4 flex gap-3">
-              <button className="px-4 py-2 rounded-md bg-primary-600 text-white" onClick={() => { setShowInvite(false); const el = document.querySelector('#rsvp-section'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }}>Xác nhận tham dự</button>
-              <button className="px-4 py-2 rounded-md bg-primary-100 text-primary-700" onClick={() => setShowInvite(false)}>Đóng</button>
+        <div className="invite-overlay">
+          <div className="card invite-modal p-6" style={{ maxWidth: 420, width: '90%' }}>
+            <h3 className="invite-title font-heading text-2xl">Bạn sẽ tham gia chứ?</h3>
+            <p className="invite-message mt-2">Vui lòng xác nhận tham dự để chúng mình chuẩn bị chu đáo.</p>
+            <div className="invite-actions">
+              <button className="btn-cta" onClick={() => { setShowInvite(false); const el = document.querySelector('#rsvp-section'); if (el) el.scrollIntoView({ behavior: 'smooth' }) }}>Xác nhận tham dự</button>
+              <button className="px-4 py-2 rounded-md btn-ghost" onClick={() => setShowInvite(false)}>Đóng</button>
             </div>
           </div>
         </div>
