@@ -1,0 +1,31 @@
+{
+  "couple": {
+    "bride": "Vân Anh",
+    "groom": "Anh Tuấn",
+    "weddingDate": "17/01/2026 - 17/01/2026",
+    "tagline": "Hân hạnh đón tiếp Quý khách!"
+  },
+  "contacts": {
+    "phone": "+84796700349",
+    "mapBride": "https://maps.app.goo.gl/KJt19nQNZMWBDrRs9",
+    "mapGroom": "https://maps.app.goo.gl/KJt19nQNZMWBDrRs9"
+  },
+  "events": [
+      {
+      "title": "Pre-wedding: Góc photobooth – sổ chúc mừng trước",
+      "location": "20 Tố Hữu, Xuân Phú, Huế, Thành phố Huế",
+      "host": "Nhà hàng Happy Land",
+      "time": "11h15 - 12h30 Chủ Nhật, ngày 17/01/2026",
+      "start": "2026-01-17T11:15:00+07:00",
+      "end": "2026-01-17T12:30:00+07:00"
+    },
+    {
+      "title": "Tiệc cưới nhà hàng",
+      "location": "20 Tố Hữu, Xuân Phú, Huế, Thành phố Huế",
+      "host": "Nhà hàng Happy Land",
+      "time": "11h30 Chủ Nhật, ngày 17/01/2026",
+      "start": "2026-01-17T11:30:00+07:00",
+      "end": "2026-01-17T15:00:00+07:00"
+    }
+  ]
+}
