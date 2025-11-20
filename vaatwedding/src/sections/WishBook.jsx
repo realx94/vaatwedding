@@ -28,7 +28,7 @@ export default function WishBook() {
           <input className="border rounded-md p-2" placeholder="Họ tên" value={name} onChange={e => setName(e.target.value)} />
           <textarea className="border rounded-md p-2" rows={1} placeholder="Lời chúc" value={message} onChange={e => setMessage(e.target.value)} />
         </div>
-        <button className="mt-4 px-4 py-2 rounded-md bg-primary-600 text-white" onClick={add}>Gửi lời chúc</button>
+        <button className="mt-4 px-4 py-2 rounded-md btn-gradient" onClick={add}>Gửi lời chúc</button>
         <div className="mt-6 space-y-3">
           {list.map((w, i) => (
             <div key={i} className="border rounded-md p-3">

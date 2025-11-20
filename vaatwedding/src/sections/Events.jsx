@@ -48,8 +48,8 @@ function EventCard({ e }) {
       <p className="text-gray-700"><span aria-hidden>🏠</span> {e.host}</p>
       <p className="mt-1 text-gray-500"><span aria-hidden>🕒</span> {e.time}</p>
       <div className="mt-auto pt-4 grid grid-cols-2 gap-2">
-        <button className="px-3 py-2 rounded-md bg-primary-600 text-white" onClick={() => addToCalendar(e)}>Thêm vào lịch</button>
-        <button className="px-3 py-2 rounded-md bg-primary-50 text-primary-700" onClick={() => openDirections(e)}>Xem chỉ đường</button>
+        <button className="px-3 py-2 rounded-md btn-gradient" onClick={() => addToCalendar(e)}>Thêm vào lịch</button>
+        <button className="px-3 py-2 rounded-md btn-gradient-light" onClick={() => openDirections(e)}>Xem chỉ đường</button>
       </div>
     </div>
   )

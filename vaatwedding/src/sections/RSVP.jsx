@@ -68,8 +68,8 @@ export default function RSVP() {
         </div>
         <textarea className="border rounded-md p-2 w-full mt-4" rows={3} placeholder="Lời nhắn" value={note} onChange={e => setNote(e.target.value)} />
         <div className="mt-4 flex gap-3">
-          <button className="px-4 py-2 rounded-md bg-primary-600 text-white" onClick={saveLocal}>Lưu RSVP</button>
-          <a className="px-4 py-2 rounded-md bg-primary-100 text-primary-700" href={`mailto:example@wedding.local?subject=RSVP&body=Ho%20ten:%20${encodeURIComponent(name)}%0ASo%20luong:%20${count}%0ATrang%20thai:%20${status}%0AKhach%20cua:%20${guestOf}%0ASu%20kien:%20${encodeURIComponent(selectedEvents.join(', '))}%0ALoi%20nhan:%20${encodeURIComponent(note)}`}>Gửi email</a>
+          <button className="px-4 py-2 rounded-md btn-gradient" onClick={saveLocal}>Lưu RSVP</button>
+          <a className="px-4 py-2 rounded-md btn-gradient-light" href={`mailto:example@wedding.local?subject=RSVP&body=Ho%20ten:%20${encodeURIComponent(name)}%0ASo%20luong:%20${count}%0ATrang%20thai:%20${status}%0AKhach%20cua:%20${guestOf}%0ASu%20kien:%20${encodeURIComponent(selectedEvents.join(', '))}%0ALoi%20nhan:%20${encodeURIComponent(note)}`}>Gửi email</a>
         </div>
         {saved && <p className="mt-3 text-green-700">Đã lưu RSVP trên thiết bị của bạn.</p>}
       </div>
