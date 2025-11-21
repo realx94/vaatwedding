@@ -38,7 +38,7 @@ export default function Hero({ couple }) {
     }
   }, [started])
   return (
-    <section ref={sectionRef} className="section pt-10 sm:pt-14 md:pt-20 text-center reveal hero-bg">
+    <section ref={sectionRef} className="section pt-10 sm:pt-14 md:pt-20 text-center hero-bg">
       <div className={`hero-content mt-auto mb-8 ${started ? 'animate-in' : 'pending'}`}>
         {showQR && (typeof document !== 'undefined') && createPortal(
           <div className="invite-overlay">
