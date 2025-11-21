@@ -107,8 +107,6 @@ export default function App() {
           )
           const maxScroll = scrollHeight - window.innerHeight
           
-          console.log('[AutoScroll] Scrolling... pos:', scrollPosition, 'maxScroll:', maxScroll)
-          
           // Dừng auto-scroll khi scroll tới cuối
           if (scrollPosition >= maxScroll) {
             console.log('[AutoScroll] Reached bottom of page, stopping auto-scroll')
