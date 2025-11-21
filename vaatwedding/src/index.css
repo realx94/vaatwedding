@@ -67,6 +67,8 @@ body { @apply bg-primary-50 text-gray-800 font-sans; background: linear-gradient
 .btn-cta::before, .btn-cta::after { content: ""; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.55); transform: translate(-50%, -50%) scale(0.5); pointer-events: none; opacity: 0; }
 .btn-cta::before { animation: ctaLine 3s ease-out infinite; }
 .btn-cta::after  { animation: ctaLine 3s ease-out infinite; animation-delay: 1.5s; }
+/* Disable pulse effect for specific buttons */
+.btn-cta.no-pulse::before, .btn-cta.no-pulse::after { animation: none; content: none; }
 @keyframes ctaLine { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.6; } 70% { transform: translate(-50%, -50%) scale(6.5); opacity: 0.2; } 100% { transform: translate(-50%, -50%) scale(8.0); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .btn-cta::before, .btn-cta::after { animation: none; content: none; } }
 
@@ -168,6 +170,34 @@ body { @apply bg-primary-50 text-gray-800 font-sans; background: linear-gradient
 .message-list::-webkit-scrollbar-track { background: transparent; }
 .message-list::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #A8DDB5 0%, #6BC584 100%); border-radius: 9999px; }
 
+/* RSVP bus important highlight */
+.bus-highlight { background: linear-gradient(135deg, rgba(227,244,231,0.85) 0%, rgba(168,221,181,0.80) 100%); border: 1px solid rgba(76,175,104,0.45); box-shadow: 0 8px 18px rgba(76,175,104,0.18), 0 0 0 4px rgba(76,175,104,0.15); }
+
+/* Form field styles */
+.form-field { display: grid; gap: 6px; }
+.form-label { font-weight: 600; color: #1F2937; }
+.required-star { color: #EF4444; margin-left: 4px; }
+.form-input, .form-select { border: 1px solid rgba(0,0,0,0.10); border-radius: 8px; padding: 8px 10px; background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(228,244,233,0.92) 100%); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+.form-input:focus, .form-select:focus { outline: 2px solid rgba(76,175,104,0.35); outline-offset: 2px; box-shadow: 0 10px 22px rgba(76,175,104,0.18); }
+.form-error { font-size: 12px; color: #EF4444; }
+.invalid { border-color: #EF4444 !important; box-shadow: 0 6px 14px rgba(239,68,68,0.18) !important; }
+.form-checkbox-row { box-shadow: 0 8px 18px rgba(0,0,0,0.10); }
+
+/* FancySelect */
+.select-wrap { position: relative; }
+.fancy-select { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.select-label { flex: 1; text-align: left; }
+.select-caret { color: #2E7D32; transition: transform 160ms ease; }
+.select-caret.open { transform: rotate(180deg); }
+.select-menu { position: absolute; left: 0; right: 0; margin-top: 6px; max-height: 220px; overflow-y: auto; background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(228,244,233,0.92) 100%); border: 1px solid rgba(255,255,255,0.55); border-radius: 12px; box-shadow: 0 16px 36px rgba(0,0,0,0.22); z-index: 50; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.select-option { padding: 10px 12px; color: #1F2937; transition: filter 160ms ease, transform 160ms ease, background 160ms ease; }
+.select-option:hover, .select-option.active { background: linear-gradient(135deg, #A8DDB5 0%, #6BC584 100%); color: #fff; filter: brightness(1.02); }
+.select-option[aria-selected="true"] { font-weight: 700; }
+.select-menu { scrollbar-width: thin; scrollbar-color: #6BC584 transparent; }
+.select-menu::-webkit-scrollbar { width: 6px; }
+.select-menu::-webkit-scrollbar-track { background: transparent; }
+.select-menu::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #A8DDB5 0%, #6BC584 100%); border-radius: 9999px; }
+
 /* WishBook book background */
 .book-section { position: relative; }
 .book-bg { position: relative; padding: 16px; border-radius: 16px; animation: bookOpen 600ms cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -176,3 +206,9 @@ body { @apply bg-primary-50 text-gray-800 font-sans; background: linear-gradient
 .book-seam { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-1px); background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.35) 100%); box-shadow: 0 0 18px rgba(0,0,0,0.20); border-radius: 2px; }
 .book-inner { position: relative; z-index: 1; }
 @keyframes bookOpen { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+/* RSVP section background */
+.rsvp-bg { position: relative; width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); border-radius: 16px; padding: 24px 16px; background-image: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.18) 100%), url('/assets/images/confirm-join-bg.jpg'); background-size: cover; background-position: center; box-shadow: 0 16px 34px rgba(0,0,0,0.25); }
+.rsvp-bg .heading { color: #ffffff; text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
+.rsvp-bg .form-label { color: #ffffff; text-shadow: 0 1px 6px rgba(0,0,0,0.45); }
+.rsvp-bg .form-checkbox-row { color: #ffffff; }
