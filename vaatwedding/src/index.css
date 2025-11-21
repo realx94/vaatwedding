@@ -107,3 +107,27 @@ body { @apply bg-primary-50 text-gray-800 font-sans; background: linear-gradient
 @keyframes timeline-dot-pulse { 0% { box-shadow: 0 0 0 0 rgba(76,175,104,0.45); } 50% { box-shadow: 0 0 0 10px rgba(76,175,104,0.0); } 100% { box-shadow: 0 0 0 0 rgba(76,175,104,0.0); } }
 @media (min-width: 768px) { .timeline-dot { left: 88px; transform: translateX(-6px); } }
 .auto-rows-fr { grid-auto-rows: 1fr; }
+/* Countdown */
+.countdown-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; justify-items: center; margin-top: 0.75rem; }
+@media (min-width: 640px) { .countdown-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.countdown-tile { position: relative; width: 140px; height: 120px; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.35); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 20px 36px rgba(58,122,254,0.35); filter: saturate(1.1); }
+.countdown-grid .countdown-tile:nth-child(1) { background: linear-gradient(135deg, #1E90FF 0%, #3A7AFE 50%, #6AE1FF 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 22px 40px rgba(58,122,254,0.45); }
+.countdown-grid .countdown-tile:nth-child(2) { background: linear-gradient(135deg, #6C50FF 0%, #7C3AED 50%, #A78BFA 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 22px 40px rgba(124,58,237,0.45); }
+.countdown-grid .countdown-tile:nth-child(3) { background: linear-gradient(135deg, #00C2FF 0%, #1E90FF 50%, #6AE1FF 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 22px 40px rgba(30,144,255,0.45); }
+.countdown-grid .countdown-tile:nth-child(4) { background: linear-gradient(135deg, #8B5CF6 0%, #3A7AFE 50%, #22D3EE 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 22px 40px rgba(139,92,246,0.45); }
+.countdown-tile::before { content: ""; position: absolute; inset: 8px; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.28); }
+.countdown-tile::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 8px; top: calc(50%); border-radius: 0 0 0.75rem 0.75rem; background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.65) 100%); }
+.countdown-number { font-family: 'Paytone One','Play',system-ui,sans-serif; font-weight: 700; font-size: 2.6rem; line-height: 1; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.35); will-change: transform, opacity; transform-origin: bottom; backface-visibility: hidden; }
+.countdown-label { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 0.68rem; letter-spacing: 0.18em; color: transparent; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 1px 6px rgba(0,0,0,0.25)); }
+/* Per-tile label gradient for contrast */
+.countdown-grid .countdown-tile:nth-child(1) .countdown-label { background-image: linear-gradient(90deg, #E0F2FE 0%, #BAE6FD 100%); }
+.countdown-grid .countdown-tile:nth-child(2) .countdown-label { background-image: linear-gradient(90deg, #E9D5FF 0%, #DDD6FE 100%); }
+.countdown-grid .countdown-tile:nth-child(3) .countdown-label { background-image: linear-gradient(90deg, #CFFAFE 0%, #A5F3FC 100%); }
+.countdown-grid .countdown-tile:nth-child(4) .countdown-label { background-image: linear-gradient(90deg, #DBEAFE 0%, #BFDBFE 100%); }
+@keyframes flipUp { 0% { transform: perspective(520px) rotateX(90deg); opacity: 0.65; } 100% { transform: perspective(520px) rotateX(0deg); opacity: 1; } }
+.flip-up { animation: flipUp 600ms cubic-bezier(0.23, 1, 0.32, 1); }
+
+/* Countdown title gradient + grow */
+.countdown-title { display: inline-block; font-family: 'Paytone One','Play',system-ui,sans-serif; font-weight: 800; font-size: clamp(1.25rem, 4vw, 2rem); letter-spacing: 0.12em; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.45); }
+.title-grow { animation: titleGrowIn 900ms cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: center; }
+@keyframes titleGrowIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }

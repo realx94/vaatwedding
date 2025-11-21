@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 function diff(target) {
   const t = target.getTime() - Date.now()
@@ -26,27 +26,48 @@ export default function Countdown({ dateStr }) {
     return () => clearInterval(id)
   }, [dateStr])
 
+  function FlipNumber({ value }) {
+    const [display, setDisplay] = useState(String(value).padStart(2, '0'))
+    const [anim, setAnim] = useState(false)
+    const prev = useRef(undefined)
+    const skipOnce = useRef(true)
+    useEffect(() => {
+      const next = String(value).padStart(2, '0')
+      if (prev.current === undefined) {
+        prev.current = next
+        setDisplay(next)
+        return
+      }
+      if (next !== prev.current) {
+        prev.current = next
+        setDisplay(next)
+        if (skipOnce.current) { skipOnce.current = false; return }
+        setAnim(true)
+        const t = setTimeout(() => setAnim(false), 650)
+        return () => clearTimeout(t)
+      }
+    }, [value])
+    return <div className={`countdown-number ${anim ? 'flip-up' : ''}`}>{display}</div>
+  }
+
+  function Tile({ value, label }) {
+    return (
+      <div className="countdown-tile">
+        <FlipNumber value={value} />
+        <div className="countdown-label">{label}</div>
+      </div>
+    )
+  }
+
   return (
     <section className="section py-6 reveal">
-      <div className="card p-6 text-center">
-        <p className="text-gray-700">Đếm ngược tới Sự Kiện Cưới</p>
-        <div className="mt-3 flex justify-center gap-6">
-          <div>
-            <div className="text-3xl font-display text-primary-700">{left.d}</div>
-            <div className="text-xs text-gray-600">Ngày</div>
-          </div>
-          <div>
-            <div className="text-3xl font-display text-primary-700">{left.h}</div>
-            <div className="text-xs text-gray-600">Giờ</div>
-          </div>
-          <div>
-            <div className="text-3xl font-display text-primary-700">{left.m}</div>
-            <div className="text-xs text-gray-600">Phút</div>
-          </div>
-          <div>
-            <div className="text-3xl font-display text-primary-700">{left.s}</div>
-            <div className="text-xs text-gray-600">Giây</div>
-          </div>
+      <div className="text-center">
+        <p className="countdown-title title-grow">Đếm ngược tới Sự Kiện Cưới</p>
+        <div className="countdown-grid">
+          <Tile value={left.d} label="NGÀY" />
+          <Tile value={left.h} label="GIỜ" />
+          <Tile value={left.m} label="PHÚT" />
+          <Tile value={left.s} label="GIÂY" />
         </div>
       </div>
     </section>
