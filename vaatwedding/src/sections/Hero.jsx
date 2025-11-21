@@ -5,6 +5,18 @@ export default function Hero({ couple }) {
   const sectionRef = useRef(null)
   const [started, setStarted] = useState(false)
   const [showQR, setShowQR] = useState(false)
+  useEffect(() => {
+    const openQR = () => setShowQR(true)
+    const closeQR = () => setShowQR(false)
+    window.addEventListener('vaat_open_qr', openQR)
+    window.addEventListener('vaat_close_qr', closeQR)
+    return () => {
+      try {
+        window.removeEventListener('vaat_open_qr', openQR)
+        window.removeEventListener('vaat_close_qr', closeQR)
+      } catch {}
+    }
+  }, [])
   const scrollTo = (id) => {
     const el = document.querySelector(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
