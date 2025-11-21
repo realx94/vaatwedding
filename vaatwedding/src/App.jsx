@@ -129,10 +129,10 @@ export default function App() {
       </div>
       <Hero couple={content.couple} />
       <Countdown dateStr={content.couple.weddingDate} />
+      <Gallery />
       <Events events={content.events} />
       <Timeline events={content.events} />
       <Maps />
-      <Gallery />
       <WishBook />
       <RSVP />
       <StickyBar />
