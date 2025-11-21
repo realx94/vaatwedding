@@ -71,68 +71,7 @@ export default function App() {
     nodes.forEach(n => io.observe(n))
     return () => io.disconnect()
   }, [])
-  useEffect(() => {
-    let idleTimer
-    let initialTimer
-    let raf
-    let running = false
-    let last = 0
-    let disabled = false
-    const velocity = 70
-    const start = () => {
-      if (running || disabled) return
-      running = true
-      last = performance.now()
-      const tick = (ts) => {
-        if (!running) return
-        if (typeof window === 'undefined' || typeof document === 'undefined') { raf = requestAnimationFrame(tick); return }
-        const dt = Math.max(0, (ts - last) / 1000)
-        last = ts
-        const maxH = Math.max(document.documentElement.scrollHeight || 0, document.body.scrollHeight || 0)
-        const atBottom = window.scrollY + window.innerHeight >= maxH - 1
-        if (atBottom) {
-          stop()
-          return
-        }
-        const y = Math.min(maxH - window.innerHeight, window.scrollY + velocity * dt)
-        window.scrollTo({ top: y })
-        raf = requestAnimationFrame(tick)
-      }
-      raf = requestAnimationFrame(tick)
-    }
-    const stop = () => {
-      running = false
-      try { cancelAnimationFrame(raf) } catch {}
-    }
-    const resetIdle = () => {
-      if (disabled) return
-      clearTimeout(idleTimer)
-      idleTimer = setTimeout(() => { if (!disabled) start(); resetIdle() }, 30000)
-    }
-    const onStop = () => { stop(); resetIdle() }
-    const onReset = () => { resetIdle() }
-    const disableAuto = () => { disabled = true; stop(); clearTimeout(idleTimer); clearTimeout(initialTimer) }
-    const enableAuto = () => { disabled = false; resetIdle() }
-    const stopEvents = ['mousedown','click','touchstart']
-    const resetEvents = ['mousemove','wheel','touchmove','keydown','scroll']
-    stopEvents.forEach(ev => window.addEventListener(ev, onStop, { passive: true }))
-    resetEvents.forEach(ev => window.addEventListener(ev, onReset, { passive: true }))
-    window.addEventListener('vaat_disable_autoscroll', disableAuto)
-    window.addEventListener('vaat_enable_autoscroll', enableAuto)
-    initialTimer = setTimeout(() => { if (!disabled) { start(); resetIdle() } }, 5000)
-    resetIdle()
-    return () => {
-      stop()
-      clearTimeout(idleTimer)
-      clearTimeout(initialTimer)
-      try {
-        stopEvents.forEach(ev => window.removeEventListener(ev, onStop))
-        resetEvents.forEach(ev => window.removeEventListener(ev, onReset))
-        window.removeEventListener('vaat_disable_autoscroll', disableAuto)
-        window.removeEventListener('vaat_enable_autoscroll', enableAuto)
-      } catch {}
-    }
-  }, [])
+  useEffect(() => {}, [])
 
   useEffect(() => {
     try {
@@ -149,13 +88,6 @@ export default function App() {
       return () => clearTimeout(timer)
     }
   }, [])
-
-  useEffect(() => {
-    try {
-      const ev = new Event(showInvite ? 'vaat_disable_autoscroll' : 'vaat_enable_autoscroll')
-      window.dispatchEvent(ev)
-    } catch {}
-  }, [showInvite])
   return (
     <div>
       {showInvite && (
