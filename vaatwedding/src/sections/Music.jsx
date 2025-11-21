@@ -53,7 +53,7 @@ export default function Music() {
   }, [])
 
   return (
-    <section className="section py-6 reveal">
+    <section className="section reveal">
       <audio id="wedding-audio" ref={audioRef} src="/assets/audio/song.mp3" preload="auto" autoPlay loop playsInline muted />
     </section>
   )

@@ -135,7 +135,6 @@ export default function App() {
       <Gallery />
       <WishBook />
       <RSVP />
-      <Footer />
       <StickyBar />
       <Music />
     </div>

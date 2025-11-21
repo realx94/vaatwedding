@@ -19,6 +19,7 @@
 }
 
 html, body, #root { height: 100%; }
+html, body { overflow-x: hidden; }
 body { @apply bg-primary-50 text-gray-800 font-sans; background: linear-gradient(135deg, #E3F4E7 0%, #C8E9CF 40%, #A8DDB5 70%, #6BC584 100%); background-attachment: fixed; }
 
 .container-px { @apply px-4 sm:px-6 lg:px-8; }
