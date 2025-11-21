@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
-function FancySelect({ value, onChange, placeholder, options, invalid }) {
+function FancySelect({ value, onChange, placeholder, options, invalid, disabled }) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(-1)
   const ref = useRef(null)
@@ -11,6 +12,7 @@ function FancySelect({ value, onChange, placeholder, options, invalid }) {
   }, [])
   const selected = options.find(o => o.value === value)
   const onKeyDown = (e) => {
+    if (disabled) return
     if (!open && (e.key === 'ArrowDown' || e.key === 'Enter')) { setOpen(true); const idx = options.findIndex(o => o.value === value); setActive(idx >= 0 ? idx : 0); return }
     if (e.key === 'ArrowDown') setActive(i => (i + 1) % options.length)
     else if (e.key === 'ArrowUp') setActive(i => (i - 1 + options.length) % options.length)
@@ -19,7 +21,7 @@ function FancySelect({ value, onChange, placeholder, options, invalid }) {
   }
   return (
     <div className={`select-wrap ${invalid ? 'invalid' : ''}`} ref={ref}>
-      <button type="button" className={`form-select fancy-select w-full ${invalid ? 'invalid' : ''}`} onClick={() => setOpen(!open)} onKeyDown={onKeyDown} aria-haspopup="listbox" aria-expanded={open}>
+      <button type="button" className={`form-select fancy-select w-full ${invalid ? 'invalid' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`} onClick={() => { if (!disabled) setOpen(!open) }} onKeyDown={onKeyDown} aria-haspopup="listbox" aria-expanded={open} disabled={disabled} aria-disabled={disabled}>
         <span className="select-label">{selected ? selected.label : placeholder}</span>
         <span className={`select-caret ${open ? 'open' : ''}`} aria-hidden>▾</span>
       </button>
@@ -44,6 +46,7 @@ export default function RSVP() {
   const [bus, setBus] = useState(false)
   const [note, setNote] = useState('')
   const [saved, setSaved] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
   const [errors, setErrors] = useState({ name: false, count: false, status: false })
 
   useEffect(() => {
@@ -53,7 +56,15 @@ export default function RSVP() {
     } catch {}
   }, [note])
 
+  useEffect(() => {
+    try {
+      const locked = localStorage.getItem('vaatwedding_rsvp_locked')
+      if (locked === 'true') setSaved(true)
+    } catch {}
+  }, [])
+
   const confirm = () => {
+    if (saved) return
     const nextErrors = {
       name: !name.trim(),
       count: !count,
@@ -62,22 +73,18 @@ export default function RSVP() {
     setErrors(nextErrors)
     if (nextErrors.name || nextErrors.count || nextErrors.status) return
     const data = { name: name.trim(), count: Number(count), status, guestOf: guestOf || 'both', bus, note, ts: Date.now() }
-    const key = 'vaatwedding_rsvp'
-    const list = JSON.parse(localStorage.getItem(key) || '[]')
-    const next = [data, ...list]
-    localStorage.setItem(key, JSON.stringify(next))
-    setSaved(true)
-    try {
-      const blob = new Blob([JSON.stringify(next, null, 2)], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'rsvp.json'
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      URL.revokeObjectURL(url)
-    } catch {}
+    fetch('/api/rsvp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      .then(r => { if (!r.ok) throw new Error('fail') })
+      .then(() => { setSaved(true); setShowSuccess(true); try { localStorage.setItem('vaatwedding_rsvp_locked', 'true') } catch {} })
+      .catch(() => {
+        const key = 'vaatwedding_rsvp'
+        const list = JSON.parse(localStorage.getItem(key) || '[]')
+        const next = [data, ...list]
+        localStorage.setItem(key, JSON.stringify(next))
+        setSaved(true)
+        setShowSuccess(true)
+        try { localStorage.setItem('vaatwedding_rsvp_locked', 'true') } catch {}
+      })
   }
 
   const valid = name.trim() && count && status
@@ -91,37 +98,48 @@ export default function RSVP() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-field sm:col-span-1">
               <label className="form-label">Tên<span className="required-star">*</span></label>
-              <input className={`form-input w-full ${errors.name ? 'invalid' : ''}`} placeholder="Nhập tên" value={name} onChange={e => setName(e.target.value)} aria-invalid={errors.name} />
+              <input className={`form-input w-full ${errors.name ? 'invalid' : ''}`} placeholder="Nhập tên" value={name} onChange={e => setName(e.target.value)} aria-invalid={errors.name} disabled={saved} />
               {errors.name && <p className="form-error">Vui lòng nhập tên</p>}
             </div>
           <div className="form-field sm:col-span-1">
             <label className="form-label">Số lượng<span className="required-star">*</span></label>
-            <FancySelect value={count} onChange={setCount} placeholder="Chọn số lượng" options={[1,2,3,4,5].map(n => ({ value: String(n), label: String(n) }))} invalid={errors.count} />
+            <FancySelect value={count} onChange={setCount} placeholder="Chọn số lượng" options={[1,2,3,4,5].map(n => ({ value: String(n), label: String(n) }))} invalid={errors.count} disabled={saved} />
             {errors.count && <p className="form-error">Vui lòng chọn số lượng</p>}
           </div>
           <div className="form-field sm:col-span-1">
             <label className="form-label">Trạng thái tham dự<span className="required-star">*</span></label>
-            <FancySelect value={status} onChange={setStatus} placeholder="Chọn trạng thái" options={[{ value: 'yes', label: 'Có, tôi sẽ tham dự' }, { value: 'no', label: 'Xin lỗi, tôi bận' }]} invalid={errors.status} />
+            <FancySelect value={status} onChange={setStatus} placeholder="Chọn trạng thái" options={[{ value: 'yes', label: 'Có, tôi sẽ tham dự' }, { value: 'no', label: 'Xin lỗi, tôi bận' }]} invalid={errors.status} disabled={saved} />
             {errors.status && <p className="form-error">Vui lòng chọn trạng thái</p>}
           </div>
           <div className="form-field sm:col-span-1">
             <label className="form-label">Khách của</label>
-            <FancySelect value={guestOf} onChange={setGuestOf} placeholder="Khách của" options={[{ value: 'groom', label: 'Chú Rể' }, { value: 'bride', label: 'Cô Dâu' }, { value: 'both', label: 'Chú Rể và Cô Dâu' }]} />
+            <FancySelect value={guestOf} onChange={setGuestOf} placeholder="Khách của" options={[{ value: 'groom', label: 'Chú Rể' }, { value: 'bride', label: 'Cô Dâu' }, { value: 'both', label: 'Chú Rể và Cô Dâu' }]} disabled={saved} />
           </div>
           <label className="bus-highlight flex items-center gap-3 p-3 rounded-md form-checkbox-row sm:col-span-2">
-            <input type="checkbox" checked={bus} onChange={e => setBus(e.target.checked)} />
+            <input type="checkbox" checked={bus} onChange={e => setBus(e.target.checked)} disabled={saved} />
             <span>Đi theo xe ô tô (Dành cho khách Đà Nẵng)</span>
           </label>
           <div className="form-field sm:col-span-2">
             <label className="form-label">Lời nhắn</label>
-            <textarea className="form-input w-full" rows={3} placeholder="Lời nhắn (không bắt buộc)" value={note} onChange={e => setNote(e.target.value)} />
+            <textarea className="form-input w-full" rows={3} placeholder="Lời nhắn (không bắt buộc)" value={note} onChange={e => setNote(e.target.value)} disabled={saved} />
           </div>
         </div>
-        <button className={`mt-4 rounded-md btn-cta no-pulse w-full ${!valid ? 'opacity-60 cursor-not-allowed' : ''}`} disabled={!valid} onClick={confirm}>Xác nhận tham dự</button>
+        <button className={`mt-4 rounded-md btn-cta no-pulse w-full ${(saved || !valid) ? 'opacity-60 cursor-not-allowed' : ''}`} disabled={saved || !valid} onClick={confirm}>{saved ? 'Đã xác nhận' : 'Xác nhận tham dự'}</button>
         <div className="mt-2 text-right">
           <a href="#" onClick={(e) => { e.preventDefault(); try { window.dispatchEvent(new Event('vaat_open_qr')) } catch {} }} className="text-sm underline hover:opacity-80">Mừng cưới</a>
         </div>
-        {saved && <p className="mt-3 text-green-700 text-sm">Đã lưu xác nhận trên thiết bị và tải file JSON.</p>}
+        {showSuccess && createPortal(
+          <div className="invite-overlay">
+            <div className="card invite-modal p-6" style={{ maxWidth: 420, width: '90%' }}>
+              <h3 className="invite-title font-heading text-2xl">Xác nhận thành công</h3>
+              <p className="invite-message mt-2">Cảm ơn bạn đã xác nhận tham dự.</p>
+              <div className="invite-actions">
+                <button className="btn-cta no-pulse" onClick={() => setShowSuccess(false)}>Đóng</button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
       </div>
       </div>
     </section>

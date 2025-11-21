@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react'
 
 export default function WishBook() {
-  const key = 'vaatwedding_wishes'
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(key) || '[]')
-      if (Array.isArray(stored) && stored.length) { setList(stored); return }
-    } catch {}
     setLoading(true)
     fetch('/data/wishes.json')
       .then(r => r.ok ? r.json() : [])
@@ -22,12 +18,16 @@ export default function WishBook() {
 
   const add = () => {
     if (!name || !message) return
-    const item = { name, message, ts: Date.now() }
-    const next = [item, ...list]
-    setList(next)
-    localStorage.setItem(key, JSON.stringify(next))
-    setName('')
-    setMessage('')
+    setSaving(true)
+    const payload = { name, message }
+    fetch('/api/wishes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(r => { if (!r.ok) throw new Error('fail') })
+      .then(() => {
+        return fetch('/data/wishes.json').then(r => r.ok ? r.json() : [])
+      })
+      .then(d => { if (Array.isArray(d)) setList(d); setName(''); setMessage('') })
+      .catch(() => {})
+      .finally(() => setSaving(false))
   }
 
   const downloadJson = () => {
@@ -55,7 +55,7 @@ export default function WishBook() {
               <input className="border rounded-md p-2 w-full" placeholder="Họ tên" value={name} onChange={e => setName(e.target.value)} />
               <textarea className="border rounded-md p-2 w-full" rows={3} placeholder="Lời chúc" value={message} onChange={e => setMessage(e.target.value)} />
             </div>
-            <button className="mt-4 px-4 py-2 rounded-md btn-gradient" onClick={add}>Gửi lời chúc</button>
+            <button className="mt-4 px-4 py-2 rounded-md btn-gradient" onClick={add} disabled={saving}>Gửi lời chúc</button>
           </div>
           <div className="card p-6">
             <div className="flex items-center justify-between">
