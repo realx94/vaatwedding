@@ -35,25 +35,32 @@ export default function Timeline({ events }) {
           try { r = Math.max(0, Math.min(1, ((new Date(e.start || e.end || Date.now()).getTime() - min) / span))) } catch {}
           if (!isFinite(r)) r = times.length > 1 ? i / (times.length - 1) : 1
           const g = grad(r)
+          const title = (e.title || '').toLowerCase()
+          const isPhotobooth = title.includes('photobooth') || title.includes('photo booth')
+          const isRestaurant = title.includes('nhà hàng') || title.includes('restaurant')
+          const img = isPhotobooth
+            ? '/assets/images/event-photobooth.jpg'
+            : isRestaurant
+            ? '/assets/images/event-restaurant.webp'
+            : '/assets/images/event-restaurant.webp'
           return (
             <li key={i} className="relative grid grid-cols-[64px_1fr] md:grid-cols-[80px_1fr] gap-4 items-start">
-              <div className="card timeline-date px-3 py-2 text-center" style={{ background: `linear-gradient(180deg, ${g.s} 0%, ${g.e} 100%)` }}>
-                <div className="text-lg md:text-xl font-display text-primary-700">{d.day}</div>
-                <div className="text-xs text-gray-600">{d.mon}</div>
-                <div className="text-xs text-gray-500">{d.year}</div>
+              <div className="card timeline-date px-3 py-2 text-center text-white" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.20) 100%), url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="text-lg md:text-xl font-display text-white drop-shadow">{d.day}</div>
+                <div className="text-xs text-white/90 drop-shadow">{d.mon}</div>
+                <div className="text-xs text-white/80 drop-shadow">{d.year}</div>
               </div>
               <div className="timeline-dot border-2 border-white" style={{ backgroundColor: g.dot }} />
               <div className="relative pl-6">
-                <div className="card timeline-card p-5">
-                  <div style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', background: `linear-gradient(135deg, ${g.s} 0%, ${g.e} 100%)`, pointerEvents: 'none', opacity: 0.45 }} />
+                <div className="card timeline-card p-5 text-white" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.20) 100%), url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                   <div className="flex flex-wrap gap-2">
                     {e.host && <span className="inline-block px-2 py-1 rounded-full bg-primary-100 text-primary-700 text-xs">{e.host}</span>}
                     {e.location && <span className="inline-block px-2 py-1 rounded-full bg-primary-50 text-primary-700 text-xs">{e.location}</span>}
                   </div>
-                  <h3 className="mt-2 font-display text-xl text-primary-700">{e.title}</h3>
+                  <h3 className="mt-2 font-display text-xl text-white drop-shadow">{e.title}</h3>
                   <div className="mt-2 space-y-1">
-                    {e.time && <p className="text-gray-700"><span aria-hidden>🕒</span> {e.time}</p>}
-                    {e.location && <p className="text-gray-700"><span aria-hidden>📍</span> {e.location}</p>}
+                    {e.time && <p className="text-white/90 drop-shadow"><span aria-hidden>🕒</span> {e.time}</p>}
+                    {e.location && <p className="text-white/90 drop-shadow"><span aria-hidden>📍</span> {e.location}</p>}
                   </div>
                 </div>
               </div>

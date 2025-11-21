@@ -42,12 +42,25 @@ function donate() {
 }
 
 function EventCard({ e }) {
+  const title = (e.title || '').toLowerCase()
+  const isPhotobooth = title.includes('photobooth') || title.includes('photo booth')
+  const isRestaurant = title.includes('nhà hàng') || title.includes('restaurant')
+  const img = isPhotobooth
+    ? '/assets/images/event-photobooth.jpg'
+    : isRestaurant
+    ? '/assets/images/event-restaurant.webp'
+    : '/assets/images/event-restaurant.webp'
+  const style = {
+    backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.20) 100%), url(${img})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }
   return (
-    <div className="card p-5 h-full flex flex-col">
-      <h3 className="font-display text-xl text-primary-700">{e.title}</h3>
-      <p className="mt-3 text-gray-700"><span aria-hidden>📍</span> {e.location}</p>
-      <p className="text-gray-700"><span aria-hidden>🏠</span> {e.host}</p>
-      <p className="mt-1 text-gray-500"><span aria-hidden>🕒</span> {e.time}</p>
+    <div className="event-card card p-5 h-full flex flex-col" style={style}>
+      <h3 className="font-display text-xl text-white drop-shadow">{e.title}</h3>
+      <p className="mt-3 text-white/90"><span aria-hidden>📍</span> {e.location}</p>
+      <p className="text-white/90"><span aria-hidden>🏠</span> {e.host}</p>
+      <p className="mt-1 text-white/80"><span aria-hidden>🕒</span> {e.time}</p>
       <div className="mt-auto pt-4 grid grid-cols-2 gap-2">
         <button className="px-3 py-2 rounded-md btn-gradient" onClick={() => addToCalendar(e)}>Thêm vào lịch</button>
         <button className="px-3 py-2 rounded-md btn-gradient-light" onClick={() => openDirections(e)}>Xem chỉ đường</button>

@@ -133,11 +133,11 @@ export default function App() {
       <Timeline events={content.events} />
       <Maps />
       <Gallery />
-      <Music />
       <WishBook />
       <RSVP />
       <Footer />
       <StickyBar />
+      <Music />
     </div>
   )
 }

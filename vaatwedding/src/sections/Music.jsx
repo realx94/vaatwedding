@@ -54,10 +54,6 @@ export default function Music() {
 
   return (
     <section className="section py-6 reveal">
-      <div className="card p-6 flex items-center justify-between">
-        <p className="text-gray-700">Nhạc nền</p>
-        <button className="px-4 py-2 rounded-md bg-primary-600 text-white" onClick={toggle}>{playing ? 'Tạm dừng' : 'Phát nhạc'}</button>
-      </div>
       <audio id="wedding-audio" ref={audioRef} src="/assets/audio/song.mp3" preload="auto" autoPlay loop playsInline muted />
     </section>
   )
