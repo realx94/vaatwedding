@@ -28,8 +28,16 @@ export default function StickyBar() {
   const toggleMusic = () => {
     const a = document.getElementById('wedding-audio')
     if (!a) return
-    if (!a.paused) { a.pause(); try { localStorage.setItem('wedding_audio_userPaused', '1') } catch {} }
-    else { a.play().catch(()=>{}); try { localStorage.setItem('wedding_audio_userPaused', '0') } catch {} }
+    if (!a.paused) { a.pause(); try { sessionStorage.setItem('wedding_audio_userPaused', '1') } catch {} }
+    else {
+      try {
+        const p = a.play()
+        if (p && typeof p.then === 'function') {
+          p.catch(() => { setTimeout(() => { try { a.play().catch(()=>{}) } catch {} }, 500) })
+        }
+      } catch {}
+      try { sessionStorage.setItem('wedding_audio_userPaused', '0') } catch {}
+    }
     setTipVisible(false)
   }
   useEffect(() => {
@@ -40,7 +48,7 @@ export default function StickyBar() {
     a.addEventListener('play', sync)
     a.addEventListener('pause', sync)
     const KEY = 'wedding_audio_userPaused'
-    const userPaused = () => { try { return localStorage.getItem(KEY) === '1' } catch { return false } }
+    const userPaused = () => { try { return sessionStorage.getItem(KEY) === '1' } catch { return false } }
     const maybeShowTip = () => {
       if (userPaused()) return
       const need = a.paused || a.muted

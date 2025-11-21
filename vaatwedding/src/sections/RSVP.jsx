@@ -75,7 +75,7 @@ export default function RSVP() {
     const data = { name: name.trim(), count: Number(count), status, guestOf: guestOf || 'both', bus, note, ts: Date.now() }
     fetch('/api/rsvp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
       .then(r => { if (!r.ok) throw new Error('fail') })
-      .then(() => { setSaved(true); setShowSuccess(true); try { localStorage.setItem('vaatwedding_rsvp_locked', 'true') } catch {} })
+      .then(() => { setSaved(true); setShowSuccess(true); try { localStorage.setItem('vaatwedding_rsvp_locked', 'true') } catch {}; try { sessionStorage.setItem('vaatwedding_invite_shown', '1') } catch {} })
       .catch(() => {
         const key = 'vaatwedding_rsvp'
         const list = JSON.parse(localStorage.getItem(key) || '[]')
@@ -84,6 +84,7 @@ export default function RSVP() {
         setSaved(true)
         setShowSuccess(true)
         try { localStorage.setItem('vaatwedding_rsvp_locked', 'true') } catch {}
+        try { sessionStorage.setItem('vaatwedding_invite_shown', '1') } catch {}
       })
   }
 

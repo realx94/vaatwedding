@@ -137,10 +137,10 @@ export default function App() {
   useEffect(() => {
     try {
       const KEY = 'vaatwedding_invite_shown'
-      const shown = localStorage.getItem(KEY)
+      const shown = sessionStorage.getItem(KEY)
       if (shown) return
       const timer = setTimeout(() => {
-        try { localStorage.setItem(KEY, '1') } catch {}
+        try { sessionStorage.setItem(KEY, '1') } catch {}
         setShowInvite(true)
       }, 30000)
       return () => clearTimeout(timer)
