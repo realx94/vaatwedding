@@ -71,7 +71,156 @@ export default function App() {
     nodes.forEach(n => io.observe(n))
     return () => io.disconnect()
   }, [])
-  useEffect(() => {}, [])
+  useEffect(() => {
+    let autoScrollInterval = null
+    let autoScrollTimeout = null
+    let resetTimeout = null
+    let isUserInteracting = false
+    let autoScrollStarted = false
+
+    const stopAutoScroll = () => {
+      console.log('[AutoScroll] Stopping auto-scroll due to user interaction')
+      isUserInteracting = true
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval)
+        autoScrollInterval = null
+      }
+    }
+
+    const startAutoScroll = () => {
+      if (isUserInteracting && autoScrollStarted) {
+        console.log('[AutoScroll] Cannot start - user is already interacting')
+        return
+      }
+      
+      autoScrollStarted = true
+      console.log('[AutoScroll] Starting auto-scroll')
+      let scrollPosition = 0
+      autoScrollInterval = setInterval(() => {
+        if (!isUserInteracting) {
+          scrollPosition += 1
+          const scrollHeight = Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.offsetHeight
+          )
+          const maxScroll = scrollHeight - window.innerHeight
+          
+          console.log('[AutoScroll] Scrolling... pos:', scrollPosition, 'maxScroll:', maxScroll)
+          
+          // Dừng auto-scroll khi scroll tới cuối
+          if (scrollPosition >= maxScroll) {
+            console.log('[AutoScroll] Reached bottom of page, stopping auto-scroll')
+            stopAutoScroll()
+            return
+          }
+          
+          // Direct assign scrollTop
+          document.documentElement.scrollTop = scrollPosition
+          document.body.scrollTop = scrollPosition
+        }
+      }, 16)
+    }
+
+    // Start auto-scroll after 5 seconds (5000ms)
+    console.log('[AutoScroll] Waiting 5 seconds before starting auto-scroll')
+    autoScrollTimeout = setTimeout(() => {
+      console.log('[AutoScroll] 5 seconds passed, initializing auto-scroll')
+      startAutoScroll()
+    }, 5000)
+
+    // Event listeners for user interaction - chỉ trigger nếu auto-scroll đã start
+    const handleWheel = (e) => {
+      if (autoScrollStarted) {
+        console.log('[AutoScroll] User interaction detected: wheel')
+        stopAutoScroll()
+        removeEventListeners()
+        
+        // Reset auto-scroll sau 30 giây không có hành động
+        clearTimeout(resetTimeout)
+        resetTimeout = setTimeout(() => {
+          console.log('[AutoScroll] No interaction for 30s, resuming auto-scroll')
+          isUserInteracting = false
+          autoScrollStarted = false
+          startAutoScroll()
+        }, 30000)
+      }
+    }
+
+    const handleTouchStart = (e) => {
+      if (autoScrollStarted) {
+        console.log('[AutoScroll] User interaction detected: touchstart')
+        stopAutoScroll()
+        removeEventListeners()
+        
+        clearTimeout(resetTimeout)
+        resetTimeout = setTimeout(() => {
+          console.log('[AutoScroll] No interaction for 30s, resuming auto-scroll')
+          isUserInteracting = false
+          autoScrollStarted = false
+          startAutoScroll()
+        }, 30000)
+      }
+    }
+
+    const handleMouseDown = (e) => {
+      if (autoScrollStarted && e.button === 0) {
+        console.log('[AutoScroll] User interaction detected: mousedown')
+        stopAutoScroll()
+        removeEventListeners()
+        
+        clearTimeout(resetTimeout)
+        resetTimeout = setTimeout(() => {
+          console.log('[AutoScroll] No interaction for 30s, resuming auto-scroll')
+          isUserInteracting = false
+          autoScrollStarted = false
+          startAutoScroll()
+        }, 30000)
+      }
+    }
+
+    const handleKeyDown = (e) => {
+      if (autoScrollStarted && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) {
+        console.log('[AutoScroll] User interaction detected: keydown -', e.key)
+        stopAutoScroll()
+        removeEventListeners()
+        
+        clearTimeout(resetTimeout)
+        resetTimeout = setTimeout(() => {
+          console.log('[AutoScroll] No interaction for 30s, resuming auto-scroll')
+          isUserInteracting = false
+          autoScrollStarted = false
+          startAutoScroll()
+        }, 30000)
+      }
+    }
+
+    const removeEventListeners = () => {
+      console.log('[AutoScroll] Removing event listeners')
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('mousedown', handleMouseDown)
+    }
+
+    const addEventListeners = () => {
+      window.addEventListener('wheel', handleWheel)
+      window.addEventListener('touchstart', handleTouchStart)
+      window.addEventListener('keydown', handleKeyDown)
+      document.addEventListener('mousedown', handleMouseDown)
+    }
+
+    addEventListeners()
+
+    return () => {
+      console.log('[AutoScroll] Cleaning up auto-scroll effect')
+      if (autoScrollInterval) clearInterval(autoScrollInterval)
+      if (autoScrollTimeout) clearTimeout(autoScrollTimeout)
+      if (resetTimeout) clearTimeout(resetTimeout)
+      removeEventListeners()
+    }
+  }, [])
 
   useEffect(() => {
     try {
