@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 function FancySelect({ value, onChange, placeholder, options, invalid }) {
   const [open, setOpen] = useState(false)
@@ -45,6 +46,7 @@ export default function RSVP() {
   const [note, setNote] = useState('')
   const [saved, setSaved] = useState(false)
   const [errors, setErrors] = useState({ name: false, count: false, status: false })
+  const [showQR, setShowQR] = useState(false)
 
   useEffect(() => {
     try {
@@ -84,6 +86,21 @@ export default function RSVP() {
 
   return (
     <section className="section py-10 reveal" id="rsvp-section">
+      {showQR && (typeof document !== 'undefined') && createPortal(
+        <div className="invite-overlay">
+          <div className="card invite-modal qr-modal p-6" style={{ maxWidth: 520, width: '92%' }}>
+            <button className="modal-close" aria-label="Đóng" onClick={() => setShowQR(false)}>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            <h3 className="invite-title font-heading text-2xl">Mừng cưới</h3>
+            <p className="invite-message mt-2">Quét mã QR để chuyển khoản mừng cưới.</p>
+            <div className="mt-4">
+              <img src="/assets/images/galleries/000.jpg" alt="QR mừng cưới" className="w-full rounded-md" />
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
       <div className="rsvp-bg">
         <h2 className="heading text-center">Xác nhận tham dự</h2>
         <div className="mt-6 card p-6 max-w-xl mx-auto">
@@ -117,6 +134,9 @@ export default function RSVP() {
           </div>
         </div>
         <button className={`mt-4 rounded-md btn-cta no-pulse w-full ${!valid ? 'opacity-60 cursor-not-allowed' : ''}`} disabled={!valid} onClick={confirm}>Xác nhận tham dự</button>
+        <div className="mt-2 text-right">
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowQR(true) }} className="text-sm underline hover:opacity-80">Mừng cưới</a>
+        </div>
         {saved && <p className="mt-3 text-green-700 text-sm">Đã lưu xác nhận trên thiết bị và tải file JSON.</p>}
       </div>
       </div>

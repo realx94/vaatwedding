@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 export default function Hero({ couple }) {
   const sectionRef = useRef(null)
   const [started, setStarted] = useState(false)
+  const [showQR, setShowQR] = useState(false)
   const scrollTo = (id) => {
     const el = document.querySelector(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
@@ -26,6 +28,21 @@ export default function Hero({ couple }) {
   return (
     <section ref={sectionRef} className="section pt-10 sm:pt-14 md:pt-20 text-center reveal hero-bg">
       <div className={`hero-content mt-auto mb-8 ${started ? 'animate-in' : 'pending'}`}>
+        {showQR && (typeof document !== 'undefined') && createPortal(
+          <div className="invite-overlay">
+            <div className="card invite-modal qr-modal p-6" style={{ maxWidth: 520, width: '92%' }}>
+              <button className="modal-close" aria-label="Đóng" onClick={() => setShowQR(false)}>
+                <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              <h3 className="invite-title font-heading text-2xl">Mừng cưới</h3>
+              <p className="invite-message mt-2">Quét mã QR để chuyển khoản mừng cưới.</p>
+              <div className="mt-4">
+                <img src="/assets/images/galleries/000.jpg" alt="QR mừng cưới" className="w-full rounded-md" />
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
         <div className="hero-title mt-4 flex items-center justify-center gap-3 px-4 py-3 rounded-xl">
           <h1 className="hero-groom text-4xl sm:text-5xl md:text-6xl font-display text-primary-700">{couple.groom}</h1>
           <span className="hero-and text-3xl md:text-4xl text-primary-600">&</span>
@@ -37,6 +54,7 @@ export default function Hero({ couple }) {
           <div className="mt-4 flex justify-center gap-3">
             <button className="px-4 py-2 rounded-md btn-gradient" onClick={() => scrollTo('#rsvp-section')}>Xác nhận tham dự</button>
             <button className="px-4 py-2 rounded-md btn-gradient-light" onClick={() => scrollTo('#wishbook-section')}>Gửi lời chúc</button>
+            <button className="px-4 py-2 rounded-md btn-gradient" onClick={() => setShowQR(true)}>Mừng cưới</button>
           </div>
         </div>
       </div>
