@@ -1,11 +1,3 @@
 [
-  {
-    "name": "Khách mời",
-    "count": 1,
-    "status": "yes",
-    "guestOf": "both",
-    "bus": false,
-    "note": "",
-    "ts": 1763688000000
-  }
+
 ]

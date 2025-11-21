@@ -12,8 +12,13 @@ import Footer from './sections/Footer'
 import StickyBar from './sections/StickyBar'
 import GiftBox from './sections/GiftBox'
 import content from './data/content.json'
+import Admin from './admin/Admin'
 
 export default function App() {
+  const isAdmin = typeof window !== 'undefined' && window.location && window.location.pathname === '/admin'
+  if (isAdmin) {
+    return <Admin />
+  }
   const [showInvite, setShowInvite] = useState(false)
   const hearts = useMemo(() => Array.from({ length: 12 }, () => ({ left: Math.random() * 100, size: 18 + Math.random() * 14, dur: 8 + Math.random() * 8, delay: Math.random() * 6 })), [])
   useEffect(() => {
