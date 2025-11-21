@@ -10,6 +10,7 @@ import WishBook from './sections/WishBook'
 import RSVP from './sections/RSVP'
 import Footer from './sections/Footer'
 import StickyBar from './sections/StickyBar'
+import GiftBox from './sections/GiftBox'
 import content from './data/content.json'
 
 export default function App() {
@@ -135,6 +136,7 @@ export default function App() {
       <Maps />
       <WishBook />
       <RSVP />
+      <GiftBox />
       <StickyBar />
       <Music />
     </div>

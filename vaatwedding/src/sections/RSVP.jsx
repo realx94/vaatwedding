@@ -83,7 +83,7 @@ export default function RSVP() {
   const valid = name.trim() && count && status
 
   return (
-    <section className="section py-10 reveal" id="rsvp-section">
+    <section className="section reveal" id="rsvp-section">
       
       <div className="rsvp-bg">
         <h2 className="heading text-center">Xác nhận tham dự</h2>
