@@ -8,7 +8,7 @@ function SectionCard({ title, children, actions }) {
           <h2 className="heading">{title}</h2>
           {actions}
         </div>
-        <div className="mt-4">{children}</div>
+        <div className="mt-4 h-[80vh] flex flex-col">{children}</div>
       </div>
     </section>
   )
@@ -49,8 +49,8 @@ const RSVPGrid = React.forwardRef(function RSVPGrid(_props, ref) {
   }, [rows, filters])
   const setF = (k, v) => setFilters(x => ({ ...x, [k]: v }))
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+    <div className="space-y-4 h-full flex flex-col">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-3 shrink-0">
         <input className="form-input w-full" placeholder="Tên" value={filters.name} onChange={e => setF('name', e.target.value)} />
         <input className="form-input w-full" placeholder="Số lượng" value={filters.count} onChange={e => setF('count', e.target.value)} />
         <select className="form-input w-full" value={filters.status} onChange={e => setF('status', e.target.value)}>
@@ -71,8 +71,8 @@ const RSVPGrid = React.forwardRef(function RSVPGrid(_props, ref) {
         </select>
         <input className="form-input w-full" placeholder="Ghi chú" value={filters.note} onChange={e => setF('note', e.target.value)} />
       </div>
-      <div className="overflow-x-auto">
-        <div className="min-w-[900px] rounded-xl border border-white/30 shadow-2xl bg-white/20 backdrop-blur-xl">
+      <div className="overflow-x-auto flex-1">
+        <div className="min-w-[900px] h-full overflow-y-auto rounded-xl border border-white/30 shadow-2xl bg-white/20 backdrop-blur-xl">
           <div className="grid grid-cols-7 gap-2 px-4 py-3 bg-gradient-to-r from-green-100 via-green-200 to-green-300 border-b border-white/40">
             <div className="font-semibold text-primary-700">Tên</div>
             <div className="font-semibold text-primary-700">Số lượng</div>
@@ -136,13 +136,13 @@ const WishesGrid = React.forwardRef(function WishesGrid(_props, ref) {
   }, [rows, filters])
   const setF = (k, v) => setFilters(x => ({ ...x, [k]: v }))
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div className="space-y-4 h-full flex flex-col">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 shrink-0">
         <input className="form-input w-full" placeholder="Tên" value={filters.name} onChange={e => setF('name', e.target.value)} />
         <input className="form-input w-full" placeholder="Lời chúc" value={filters.message} onChange={e => setF('message', e.target.value)} />
       </div>
-      <div className="overflow-x-auto">
-        <div className="min-w-[600px] rounded-xl border border-white/30 shadow-2xl bg-white/20 backdrop-blur-xl">
+      <div className="overflow-x-auto flex-1">
+        <div className="min-w-[600px] h-full overflow-y-auto rounded-xl border border-white/30 shadow-2xl bg-white/20 backdrop-blur-xl">
           <div className="grid grid-cols-3 gap-2 px-4 py-3 bg-gradient-to-r from-green-100 via-green-200 to-green-300 border-b border-white/40">
             <div className="font-semibold text-primary-700">Tên</div>
             <div className="font-semibold text-primary-700">Lời chúc</div>
@@ -174,7 +174,13 @@ const WishesGrid = React.forwardRef(function WishesGrid(_props, ref) {
 export default function Admin() {
   const [ok, setOk] = useState(false)
   const [pwd, setPwd] = useState('')
-  const check = () => { if (pwd === '17012026') setOk(true) }
+  const check = () => { if (pwd === '17012026') { setOk(true); try { sessionStorage.setItem('vaatwedding_admin_pwd', pwd) } catch {} } }
+  useEffect(() => {
+    try {
+      const pre = sessionStorage.getItem('vaatwedding_admin_pwd')
+      if (pre === '17012026') setOk(true)
+    } catch {}
+  }, [])
   const rsvpRef = useRef(null)
   const wishRef = useRef(null)
   if (!ok) {
