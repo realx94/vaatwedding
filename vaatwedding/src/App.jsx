@@ -20,6 +20,7 @@ export default function App() {
     return <Admin />
   }
   const [showInvite, setShowInvite] = useState(false)
+  const [shouldStartAutoScroll, setShouldStartAutoScroll] = useState(false)
   const hearts = useMemo(() => Array.from({ length: 12 }, () => ({ left: Math.random() * 100, size: 18 + Math.random() * 14, dur: 8 + Math.random() * 8, delay: Math.random() * 6 })), [])
   useEffect(() => {
     const addPreload = (href, as, type) => {
@@ -72,8 +73,9 @@ export default function App() {
     return () => io.disconnect()
   }, [])
   useEffect(() => {
+    if (!shouldStartAutoScroll) return
+
     let autoScrollInterval = null
-    let autoScrollTimeout = null
     let resetTimeout = null
     let isUserInteracting = false
     let autoScrollStarted = false
@@ -134,59 +136,36 @@ export default function App() {
       }, 16)
     }
 
-    // Start auto-scroll after 5 seconds (5000ms)
-    console.log('[AutoScroll] Waiting 5 seconds before starting auto-scroll')
-    autoScrollTimeout = setTimeout(() => {
-      console.log('[AutoScroll] 5 seconds passed, initializing auto-scroll')
-      startAutoScroll()
-    }, 5000)
+    // Start auto-scroll immediately when triggered
+    console.log('[AutoScroll] Overlay closed, starting auto-scroll')
+    startAutoScroll()
 
     // Event listeners for user interaction
     const handleWheel = (e) => {
-      if (!autoScrollStarted) {
-        console.log('[AutoScroll] User interaction detected during initial delay: wheel')
-        clearTimeout(autoScrollTimeout)
-        autoScrollTimeout = null
-      } else if (!isUserInteracting) {
+      if (!isUserInteracting) {
         console.log('[AutoScroll] User interaction detected: wheel')
         stopAutoScroll()
       }
     }
 
     const handleTouchStart = (e) => {
-      if (!autoScrollStarted) {
-        console.log('[AutoScroll] User interaction detected during initial delay: touchstart')
-        clearTimeout(autoScrollTimeout)
-        autoScrollTimeout = null
-      } else if (!isUserInteracting) {
+      if (!isUserInteracting) {
         console.log('[AutoScroll] User interaction detected: touchstart')
         stopAutoScroll()
       }
     }
 
     const handleMouseDown = (e) => {
-      if (e.button === 0) {
-        if (!autoScrollStarted) {
-          console.log('[AutoScroll] User interaction detected during initial delay: mousedown')
-          clearTimeout(autoScrollTimeout)
-          autoScrollTimeout = null
-        } else if (!isUserInteracting) {
-          console.log('[AutoScroll] User interaction detected: mousedown')
-          stopAutoScroll()
-        }
+      if (e.button === 0 && !isUserInteracting) {
+        console.log('[AutoScroll] User interaction detected: mousedown')
+        stopAutoScroll()
       }
     }
 
     const handleKeyDown = (e) => {
-      if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) {
-        if (!autoScrollStarted) {
-          console.log('[AutoScroll] User interaction detected during initial delay: keydown -', e.key)
-          clearTimeout(autoScrollTimeout)
-          autoScrollTimeout = null
-        } else if (!isUserInteracting) {
-          console.log('[AutoScroll] User interaction detected: keydown -', e.key)
-          stopAutoScroll()
-        }
+      if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key) && !isUserInteracting) {
+        console.log('[AutoScroll] User interaction detected: keydown -', e.key)
+        stopAutoScroll()
       }
     }
 
@@ -214,7 +193,6 @@ export default function App() {
     return () => {
       console.log('[AutoScroll] Cleaning up auto-scroll effect')
       if (autoScrollInterval) clearInterval(autoScrollInterval)
-      if (autoScrollTimeout) clearTimeout(autoScrollTimeout)
       if (resetTimeout) clearTimeout(resetTimeout)
       window.removeEventListener('wheel', handleWheel)
       window.removeEventListener('wheel', handleAnyInteraction)
@@ -225,7 +203,7 @@ export default function App() {
       document.removeEventListener('mousedown', handleMouseDown)
       document.removeEventListener('mousedown', handleAnyInteraction)
     }
-  }, [])
+  }, [shouldStartAutoScroll])
 
   useEffect(() => {
     try {
@@ -261,7 +239,7 @@ export default function App() {
           <div key={i} className="heart" style={{ left: `${h.left}%`, fontSize: h.size, animationDuration: `${h.dur}s`, animationDelay: `${h.delay}s` }}>❤️</div>
         ))}
       </div>
-      <Hero couple={content.couple} />
+      <Hero couple={content.couple} onOverlayClosed={() => setShouldStartAutoScroll(true)} />
       <Countdown dateStr={content.couple.weddingDate} />
       <Gallery />
       <Events events={content.events} />

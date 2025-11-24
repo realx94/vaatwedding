@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-export default function Hero({ couple }) {
+export default function Hero({ couple, onOverlayClosed }) {
   const sectionRef = useRef(null)
   const [started, setStarted] = useState(false)
   const [showQR, setShowQR] = useState(false)
@@ -226,7 +226,10 @@ export default function Hero({ couple }) {
               <button
                 onClick={() => {
                   setIsAnimating(true)
-                  setTimeout(() => setOverlayOpen(false), 1000)
+                  setTimeout(() => {
+                    setOverlayOpen(false)
+                    if (onOverlayClosed) onOverlayClosed()
+                  }, 1000)
                 }}
                 className={`open-button ${isAnimating ? 'animate' : ''}`}
                 disabled={isAnimating}
