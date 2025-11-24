@@ -251,8 +251,8 @@ export default function Hero({ couple, onOverlayClosed }) {
               </button>
               <h3 className="invite-title font-heading text-2xl">Mừng cưới</h3>
               <p className="invite-message mt-2">Quét mã QR để chuyển khoản mừng cưới.</p>
-              <div className="mt-4">
-                <img src="/assets/images/galleries/000.jpg" alt="QR mừng cưới" className="w-full rounded-md" />
+              <div className="mt-4 flex justify-center">
+                <img src="/assets/images/qr.jpg" alt="QR mừng cưới" className="rounded-md" style={{ height: '350px', width: '260px', objectFit: 'contain' }} />
               </div>
             </div>
           </div>,

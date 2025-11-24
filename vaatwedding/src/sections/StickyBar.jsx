@@ -19,7 +19,7 @@ export default function StickyBar() {
     const el = document.querySelector('#rsvp-section')
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
-  const openMapBride = () => window.open(content.contacts.mapBride, '_blank')
+  const openMapRestaurant = () => window.open(content.contacts.mapRestaurant, '_blank')
   const callPhone = () => window.location.href = `tel:${content.contacts.phone}`
   const openWish = () => {
     const el = document.querySelector('#wishbook-section')
@@ -83,7 +83,7 @@ export default function StickyBar() {
               <path d="M2 4a2 2 0 012-2h2a2 2 0 012 2v2c0 .55-.22 1.05-.59 1.41L7.5 8.33a16 16 0 008.17 8.17l.92-1.33c.36-.37.86-.59 1.41-.59h2a2 2 0 012 2v2a2 2 0 01-2 2h-2C9.16 21 3 14.84 3 6V4a2 2 0 01-1-0z" fill="url(#g-phone)"/>
             </svg>
           </button>
-          <button className="fab fab-item fab-map" aria-label="Chỉ đường" title="Chỉ đường" onClick={openMapBride}>
+          <button className="fab fab-item fab-map" aria-label="Chỉ đường" title="Chỉ đường" onClick={openMapRestaurant}>
             <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden>
               <defs>
                 <linearGradient id="g-map" x1="0" y1="0" x2="1" y2="1">
