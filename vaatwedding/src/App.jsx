@@ -86,7 +86,8 @@ export default function App() {
       isUserInteracting = true
       if (autoScrollInterval) {
         clearInterval(autoScrollInterval)
-        autoScrollInterval = nuóng      }
+        autoScrollInterval = null     
+      }
       
       // Set up auto-resume after 30s
       clearTimeout(resetTimeout)
