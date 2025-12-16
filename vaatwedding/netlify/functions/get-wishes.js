@@ -23,22 +23,35 @@ exports.handler = async (event, context) => {
     const token = process.env.NETLIFY_API_TOKEN
 
     if (!siteId || !token) {
+      console.error('Missing config:', { siteId: !!siteId, token: !!token })
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'Configuration missing' })
+        body: JSON.stringify({ error: 'Configuration missing', details: { siteId: !!siteId, token: !!token } })
       }
     }
 
+    const url = `https://api.netlify.com/api/v1/sites/${siteId}/forms/wishes/submissions`
+    console.log('Fetching wishes from:', url)
+
     // Fetch wishes submissions from Netlify API
-    const response = await fetch(
-      `https://api.netlify.com/api/v1/sites/${siteId}/forms/wishes/submissions`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-    )
+    })
+
+    console.log('Response status:', response.status)
+
+    // If form doesn't exist yet (404), return empty array
+    if (response.status === 404) {
+      console.log('Form not found (404) - likely no submissions yet or form name mismatch')
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify([])
+      }
+    }
 
     if (!response.ok) {
       throw new Error(`Netlify API error: ${response.status}`)

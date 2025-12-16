@@ -120,7 +120,7 @@ export default function RSVP() {
   return (
     <section className="section reveal" id="rsvp-section">
       {/* Hidden form for Netlify Forms detection */}
-      <form name="rsvp" netlify="true" netlify-honeypot="bot-field" hidden>
+      <form name="rsvp" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
         <input type="text" name="name" />
         <input type="text" name="count" />
         <input type="text" name="status" />

@@ -65,19 +65,12 @@ export default function WishBook() {
 
   return (
     <section className="section py-10 reveal book-section" id="wishbook-section">
-      {/* Hidden form for Netlify Forms detection */}
-      <form name="wishes" netlify="true" netlify-honeypot="bot-field" hidden>
-        <input type="text" name="name" />
-        <textarea name="message"></textarea>
-        <input type="text" name="timestamp" />
-      </form>
-      
       <h2 className="heading">Sổ lời chúc</h2>
       <div className="mt-6 book-bg">
         <div className="book-seam" />
         <div className="book-inner grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           <div className="card p-6">
-            <form onSubmit={add}>
+            <form name="wishes" onSubmit={add}>
               <div className="space-y-3">
                 <input 
                   className="border rounded-md p-2 w-full" 

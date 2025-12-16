@@ -11,6 +11,23 @@
     <title>Anh Tuấn &amp; Vân Anh wedding</title>
   </head>
   <body>
+    <!-- Netlify Forms detection -->
+    <form name="wishes" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <textarea name="message"></textarea>
+      <input type="text" name="timestamp" />
+    </form>
+    
+    <form name="rsvp" data-netlify="true" data-netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="text" name="count" />
+      <input type="text" name="status" />
+      <input type="text" name="guestOf" />
+      <input type="text" name="bus" />
+      <textarea name="note"></textarea>
+      <input type="text" name="timestamp" />
+    </form>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
