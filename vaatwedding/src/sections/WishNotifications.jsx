@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from 'react'
 
+const GRADIENTS = [
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+  'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+  'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+  'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+  'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)'
+]
+
 export default function WishNotifications() {
   const [wishes, setWishes] = useState([])
   const [displayedWishes, setDisplayedWishes] = useState([])
@@ -37,11 +50,12 @@ export default function WishNotifications() {
       const newWish = {
         ...wishes[queueIndex],
         id: `${wishes[queueIndex].ts}-${queueIndex}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        gradient: GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)]
       }
 
       setDisplayedWishes(prev => {
-        // If we already have 5, wait for the oldest one to disappear
+        // If we already have 5, don't add yet
         if (prev.length >= 5) {
           return prev
         }
@@ -51,13 +65,16 @@ export default function WishNotifications() {
       setQueueIndex(prev => prev + 1)
     }
 
-    // Function to remove old notifications (after 3 seconds)
-    const cleanupInterval = setInterval(() => {
-      const now = Date.now()
-      setDisplayedWishes(prev => 
-        prev.filter(wish => now - wish.timestamp < 3000)
-      )
-    }, 100)
+    // Remove oldest notification after 5 seconds if queue is full
+    const removalInterval = setInterval(() => {
+      setDisplayedWishes(prev => {
+        if (prev.length >= 5 && queueIndex < wishes.length) {
+          // Remove the oldest (first) item
+          return prev.slice(1)
+        }
+        return prev
+      })
+    }, 5000)
 
     // Add first notification immediately
     if (queueIndex === 0 && displayedWishes.length === 0) {
@@ -72,7 +89,7 @@ export default function WishNotifications() {
     }, 2000)
 
     return () => {
-      clearInterval(cleanupInterval)
+      clearInterval(removalInterval)
       clearInterval(addInterval)
     }
   }, [wishes, queueIndex, displayedWishes.length])
@@ -86,26 +103,24 @@ export default function WishNotifications() {
   if (displayedWishes.length === 0) return null
 
   return (
-    <div className="fixed top-4 left-4 z-50 space-y-2 pointer-events-none">
+    <div className="fixed top-4 right-4 z-50 space-y-2 pointer-events-none">
       {displayedWishes.map((wish, index) => {
-        const age = Date.now() - wish.timestamp
-        const isLeaving = age > 2700 // Start fade out at 2.7s
-        
         return (
           <div
             key={wish.id}
-            className={`wish-notification ${isLeaving ? 'wish-notification-leaving' : 'wish-notification-entering'}`}
+            className="wish-notification wish-notification-entering"
             style={{
+              background: wish.gradient,
               animationDelay: `${index * 0.1}s`
             }}
           >
             <div className="flex items-start gap-2">
               <div className="flex-shrink-0 text-2xl">💌</div>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm text-pink-600 truncate">
+                <div className="font-semibold text-sm text-white truncate drop-shadow-sm">
                   {wish.name}
                 </div>
-                <div className="text-xs text-gray-700 line-clamp-2">
+                <div className="text-xs text-white/90 line-clamp-2 drop-shadow-sm">
                   {wish.message}
                 </div>
               </div>
