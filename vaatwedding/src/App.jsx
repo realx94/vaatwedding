@@ -11,6 +11,7 @@ import RSVP from './sections/RSVP'
 import Footer from './sections/Footer'
 import StickyBar from './sections/StickyBar'
 import GiftBox from './sections/GiftBox'
+import WishNotifications from './sections/WishNotifications'
 import content from './data/content.json'
 import Admin from './admin/Admin'
 
@@ -239,6 +240,7 @@ export default function App() {
           <div key={i} className="heart" style={{ left: `${h.left}%`, fontSize: h.size, animationDuration: `${h.dur}s`, animationDelay: `${h.delay}s` }}>❤️</div>
         ))}
       </div>
+      <WishNotifications />
       <Hero couple={content.couple} onOverlayClosed={() => setShouldStartAutoScroll(true)} />
       <Countdown dateStr={content.couple.weddingDate} />
       <Gallery />
