@@ -65,16 +65,13 @@ export default function WishNotifications() {
       setQueueIndex(prev => prev + 1)
     }
 
-    // Remove oldest notification after 5 seconds if queue is full
-    const removalInterval = setInterval(() => {
-      setDisplayedWishes(prev => {
-        if (prev.length >= 5 && queueIndex < wishes.length) {
-          // Remove the oldest (first) item
-          return prev.slice(1)
-        }
-        return prev
-      })
-    }, 5000)
+    // Auto-remove notifications after 20 seconds
+    const autoRemovalInterval = setInterval(() => {
+      const now = Date.now()
+      setDisplayedWishes(prev => 
+        prev.filter(wish => now - wish.timestamp < 20000)
+      )
+    }, 1000)
 
     // Add first notification immediately
     if (queueIndex === 0 && displayedWishes.length === 0) {
@@ -89,7 +86,7 @@ export default function WishNotifications() {
     }, 2000)
 
     return () => {
-      clearInterval(removalInterval)
+      clearInterval(autoRemovalInterval)
       clearInterval(addInterval)
     }
   }, [wishes, queueIndex, displayedWishes.length])
@@ -102,6 +99,10 @@ export default function WishNotifications() {
 
   if (displayedWishes.length === 0) return null
 
+  const handleRemove = (wishId) => {
+    setDisplayedWishes(prev => prev.filter(w => w.id !== wishId))
+  }
+
   return (
     <div className="fixed top-6 right-6 z-[9998] space-y-3 pointer-events-none max-w-[90vw] md:max-w-[400px]">
       {displayedWishes.map((wish, index) => {
@@ -113,6 +114,7 @@ export default function WishNotifications() {
               background: wish.gradient,
               animationDelay: `${index * 0.1}s`
             }}
+            onClick={() => handleRemove(wish.id)}
           >
             <div className="flex items-start gap-2">
               <div className="flex-shrink-0 text-2xl">💌</div>
