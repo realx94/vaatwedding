@@ -72,11 +72,38 @@ export default function RSVP() {
     }
     setErrors(nextErrors)
     if (nextErrors.name || nextErrors.count || nextErrors.status) return
-    const data = { name: name.trim(), count: Number(count), status, guestOf: guestOf || 'both', bus, note, ts: Date.now() }
-    fetch('/api/rsvp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-      .then(r => { if (!r.ok) throw new Error('fail') })
-      .then(() => { setSaved(true); setShowSuccess(true); try { localStorage.setItem('vaatwedding_rsvp_locked', 'true') } catch {}; try { sessionStorage.setItem('vaatwedding_invite_shown', '1') } catch {} })
+    
+    const data = { 
+      name: name.trim(), 
+      count: Number(count), 
+      status, 
+      guestOf: guestOf || 'both', 
+      bus: bus ? 'yes' : 'no', 
+      note, 
+      timestamp: new Date().toISOString()
+    }
+    
+    // Submit to Netlify Forms
+    const formData = new FormData()
+    formData.append('form-name', 'rsvp')
+    Object.keys(data).forEach(key => {
+      formData.append(key, String(data[key]))
+    })
+    
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(formData).toString()
+    })
+      .then(r => { 
+        if (!r.ok) throw new Error('fail')
+        setSaved(true)
+        setShowSuccess(true)
+        try { localStorage.setItem('vaatwedding_rsvp_locked', 'true') } catch {}
+        try { sessionStorage.setItem('vaatwedding_invite_shown', '1') } catch {}
+      })
       .catch(() => {
+        // Fallback to localStorage
         const key = 'vaatwedding_rsvp'
         const list = JSON.parse(localStorage.getItem(key) || '[]')
         const next = [data, ...list]
@@ -92,6 +119,16 @@ export default function RSVP() {
 
   return (
     <section className="section reveal" id="rsvp-section">
+      {/* Hidden form for Netlify Forms detection */}
+      <form name="rsvp" netlify="true" netlify-honeypot="bot-field" hidden>
+        <input type="text" name="name" />
+        <input type="text" name="count" />
+        <input type="text" name="status" />
+        <input type="text" name="guestOf" />
+        <input type="text" name="bus" />
+        <textarea name="note"></textarea>
+        <input type="text" name="timestamp" />
+      </form>
       
       <div className="rsvp-bg">
         <h2 className="heading text-center">Xác nhận tham dự</h2>

@@ -16,17 +16,36 @@ export default function WishBook() {
       .finally(() => setLoading(false))
   }, [])
 
-  const add = () => {
+  const add = (e) => {
+    e?.preventDefault()
     if (!name || !message) return
     setSaving(true)
-    const payload = { name, message }
-    fetch('/api/wishes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      .then(r => { if (!r.ok) throw new Error('fail') })
-      .then(() => {
-        return fetch('/data/wishes.json').then(r => r.ok ? r.json() : [])
+    
+    // Submit to Netlify Forms
+    const formData = new FormData()
+    formData.append('form-name', 'wishes')
+    formData.append('name', name)
+    formData.append('message', message)
+    formData.append('timestamp', new Date().toISOString())
+    
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(formData).toString()
+    })
+      .then(r => {
+        if (!r.ok) throw new Error('fail')
+        // Add to local list immediately for UI feedback
+        const newItem = { name, message, ts: Date.now() }
+        setList([newItem, ...list])
+        setName('')
+        setMessage('')
+        alert('Cảm ơn lời chúc của bạn! ❤️')
       })
-      .then(d => { if (Array.isArray(d)) setList(d); setName(''); setMessage('') })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Error submitting wish:', err)
+        alert('Có lỗi xảy ra. Vui lòng thử lại sau.')
+      })
       .finally(() => setSaving(false))
   }
 
@@ -46,16 +65,44 @@ export default function WishBook() {
 
   return (
     <section className="section py-10 reveal book-section" id="wishbook-section">
+      {/* Hidden form for Netlify Forms detection */}
+      <form name="wishes" netlify="true" netlify-honeypot="bot-field" hidden>
+        <input type="text" name="name" />
+        <textarea name="message"></textarea>
+        <input type="text" name="timestamp" />
+      </form>
+      
       <h2 className="heading">Sổ lời chúc</h2>
       <div className="mt-6 book-bg">
         <div className="book-seam" />
         <div className="book-inner grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           <div className="card p-6">
-            <div className="space-y-3">
-              <input className="border rounded-md p-2 w-full" placeholder="Họ tên" value={name} onChange={e => setName(e.target.value)} />
-              <textarea className="border rounded-md p-2 w-full" rows={3} placeholder="Lời chúc" value={message} onChange={e => setMessage(e.target.value)} />
-            </div>
-            <button className="mt-4 px-4 py-2 rounded-md btn-gradient" onClick={add} disabled={saving}>Gửi lời chúc</button>
+            <form onSubmit={add}>
+              <div className="space-y-3">
+                <input 
+                  className="border rounded-md p-2 w-full" 
+                  placeholder="Họ tên" 
+                  value={name} 
+                  onChange={e => setName(e.target.value)}
+                  required
+                />
+                <textarea 
+                  className="border rounded-md p-2 w-full" 
+                  rows={3} 
+                  placeholder="Lời chúc" 
+                  value={message} 
+                  onChange={e => setMessage(e.target.value)}
+                  required
+                />
+              </div>
+              <button 
+                type="submit"
+                className="mt-4 px-4 py-2 rounded-md btn-gradient" 
+                disabled={saving}
+              >
+                {saving ? 'Đang gửi...' : 'Gửi lời chúc'}
+              </button>
+            </form>
           </div>
           <div className="card p-6">
             <div className="flex items-center justify-between">

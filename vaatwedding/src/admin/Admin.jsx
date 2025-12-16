@@ -23,7 +23,7 @@ const RSVPGrid = React.forwardRef(function RSVPGrid(_props, ref) {
   }, [])
   const load = () => {
     setLoading(true)
-    fetch(`/data/rsvp.json?ts=${Date.now()}`)
+    fetch(`/api/get-rsvp?ts=${Date.now()}`)
       .then(r => r.ok ? r.json() : [])
       .then(d => { if (Array.isArray(d)) setRows(d) })
       .catch(() => {})
@@ -118,7 +118,7 @@ const WishesGrid = React.forwardRef(function WishesGrid(_props, ref) {
   }, [])
   const load = () => {
     setLoading(true)
-    fetch(`/data/wishes.json?ts=${Date.now()}`)
+    fetch(`/api/get-wishes?ts=${Date.now()}`)
       .then(r => r.ok ? r.json() : [])
       .then(d => { if (Array.isArray(d)) setRows(d) })
       .catch(() => {})
