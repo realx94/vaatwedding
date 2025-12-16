@@ -103,7 +103,7 @@ export default function WishNotifications() {
   if (displayedWishes.length === 0) return null
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 pointer-events-none">
+    <div className="fixed top-6 right-6 z-[9998] space-y-3 pointer-events-none max-w-[90vw] md:max-w-[400px]">
       {displayedWishes.map((wish, index) => {
         return (
           <div
