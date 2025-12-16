@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef, useImperativeHandle } from 'react'
+import { createPortal } from 'react-dom'
 
 function SectionCard({ title, children, actions }) {
   return (
@@ -18,6 +19,7 @@ const RSVPGrid = React.forwardRef(function RSVPGrid(_props, ref) {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({ name: '', count: '', status: '', guestOf: '', bus: '', note: '' })
+  const [selectedRow, setSelectedRow] = useState(null)
   useEffect(() => {
     load()
   }, [])
@@ -92,7 +94,11 @@ const RSVPGrid = React.forwardRef(function RSVPGrid(_props, ref) {
             const dt = new Date(r.ts || Date.now())
             const time = dt.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
             return (
-              <div key={i} className="grid grid-cols-7 gap-2 px-4 py-3 border-t border-white/20 hover:bg-white/20">
+              <div 
+                key={i} 
+                className="grid grid-cols-7 gap-2 px-4 py-3 border-t border-white/20 hover:bg-white/20 cursor-pointer"
+                onClick={() => setSelectedRow(r)}
+              >
                 <div className="truncate">{r.name}</div>
                 <div>{r.count}</div>
                 <div>{r.status === 'yes' ? 'Tham dự' : r.status === 'no' ? 'Không tham dự' : ''}</div>
@@ -105,6 +111,50 @@ const RSVPGrid = React.forwardRef(function RSVPGrid(_props, ref) {
           })}
         </div>
       </div>
+      
+      {selectedRow && createPortal(
+        <div className="invite-overlay" onClick={() => setSelectedRow(null)}>
+          <div className="card invite-modal p-6" style={{ maxWidth: 600, width: '90%' }} onClick={e => e.stopPropagation()}>
+            <h3 className="invite-title font-heading text-2xl mb-4">Thông tin chi tiết</h3>
+            <div className="space-y-3">
+              <div className="flex">
+                <span className="font-semibold w-32">Tên:</span>
+                <span>{selectedRow.name}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Số lượng:</span>
+                <span>{selectedRow.count}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Trạng thái:</span>
+                <span>{selectedRow.status === 'yes' ? 'Tham dự' : selectedRow.status === 'no' ? 'Không tham dự' : ''}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Khách của:</span>
+                <span>{selectedRow.guestOf === 'groom' ? 'Chú Rể' : selectedRow.guestOf === 'bride' ? 'Cô Dâu' : 'Chú Rể và Cô Dâu'}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Đi xe:</span>
+                <span>{selectedRow.bus ? 'Có' : 'Không'}</span>
+              </div>
+              {selectedRow.note && (
+                <div className="flex">
+                  <span className="font-semibold w-32">Ghi chú:</span>
+                  <span className="flex-1">{selectedRow.note}</span>
+                </div>
+              )}
+              <div className="flex">
+                <span className="font-semibold w-32">Thời gian:</span>
+                <span>{new Date(selectedRow.ts || Date.now()).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}</span>
+              </div>
+            </div>
+            <div className="invite-actions mt-4">
+              <button className="btn-cta no-pulse" onClick={() => setSelectedRow(null)}>Đóng</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   )
 })
@@ -113,6 +163,7 @@ const WishesGrid = React.forwardRef(function WishesGrid(_props, ref) {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [filters, setFilters] = useState({ name: '', message: '' })
+  const [selectedRow, setSelectedRow] = useState(null)
   useEffect(() => {
     load()
   }, [])
@@ -158,7 +209,11 @@ const WishesGrid = React.forwardRef(function WishesGrid(_props, ref) {
             const dt = new Date(r.ts || Date.now())
             const time = dt.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
             return (
-              <div key={i} className="grid grid-cols-3 gap-2 px-4 py-3 border-t border-white/20 hover:bg-white/20">
+              <div 
+                key={i} 
+                className="grid grid-cols-3 gap-2 px-4 py-3 border-t border-white/20 hover:bg-white/20 cursor-pointer"
+                onClick={() => setSelectedRow(r)}
+              >
                 <div className="truncate">{r.name}</div>
                 <div className="truncate">{r.message}</div>
                 <div className="text-sm text-gray-600">{time}</div>
@@ -167,6 +222,32 @@ const WishesGrid = React.forwardRef(function WishesGrid(_props, ref) {
           })}
         </div>
       </div>
+      
+      {selectedRow && createPortal(
+        <div className="invite-overlay" onClick={() => setSelectedRow(null)}>
+          <div className="card invite-modal p-6" style={{ maxWidth: 600, width: '90%' }} onClick={e => e.stopPropagation()}>
+            <h3 className="invite-title font-heading text-2xl mb-4">Chi tiết lời chúc</h3>
+            <div className="space-y-3">
+              <div className="flex">
+                <span className="font-semibold w-32">Tên:</span>
+                <span>{selectedRow.name}</span>
+              </div>
+              <div>
+                <span className="font-semibold block mb-2">Lời chúc:</span>
+                <p className="bg-white/20 p-3 rounded-lg">{selectedRow.message}</p>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Thời gian:</span>
+                <span>{new Date(selectedRow.ts || Date.now()).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}</span>
+              </div>
+            </div>
+            <div className="invite-actions mt-4">
+              <button className="btn-cta no-pulse" onClick={() => setSelectedRow(null)}>Đóng</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   )
 })

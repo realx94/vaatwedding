@@ -4,3 +4,5 @@ vaatwedding/node_modules/
 vaatwedding/dist/
 vaatwedding/data/rsvp.json
 vaatwedding/data/wishes.json
+vaatwedding/.env
+vaatwedding/test-forms.js
