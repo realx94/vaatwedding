@@ -31,10 +31,47 @@ exports.handler = async (event, context) => {
       }
     }
 
-    const url = `https://api.netlify.com/api/v1/sites/${siteId}/forms/rsvp/submissions`
+    // First, get the form ID by name
+    const formsUrl = `https://api.netlify.com/api/v1/sites/${siteId}/forms`
+    console.log('Fetching forms list from:', formsUrl)
+
+    const formsResponse = await fetch(formsUrl, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (!formsResponse.ok) {
+      throw new Error(`Netlify API error getting forms: ${formsResponse.status}`)
+    }
+
+    const forms = await formsResponse.json()
+    const rsvpForm = forms.find(f => f.name === 'rsvp')
+
+    if (!rsvpForm) {
+      console.log('RSVP form not found')
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify([])
+      }
+    }
+
+    console.log('Found RSVP form:', rsvpForm.id, 'submissions:', rsvpForm.submission_count)
+
+    // If no submissions, return empty array
+    if (rsvpForm.submission_count === 0) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify([])
+      }
+    }
+
+    // Fetch submissions using form ID
+    const url = `https://api.netlify.com/api/v1/forms/${rsvpForm.id}/submissions`
     console.log('Fetching RSVP from:', url)
 
-    // Fetch RSVP submissions from Netlify API
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -42,16 +79,6 @@ exports.handler = async (event, context) => {
     })
 
     console.log('Response status:', response.status)
-
-    // If form doesn't exist yet (404), return empty array
-    if (response.status === 404) {
-      console.log('Form not found (404) - likely no submissions yet or form name mismatch')
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify([])
-      }
-    }
 
     if (!response.ok) {
       throw new Error(`Netlify API error: ${response.status}`)

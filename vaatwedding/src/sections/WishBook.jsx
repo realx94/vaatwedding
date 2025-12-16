@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 export default function WishBook() {
   const [name, setName] = useState('')
@@ -6,14 +7,19 @@ export default function WishBook() {
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
-  useEffect(() => {
+  const fetchWishes = () => {
     setLoading(true)
-    fetch('/data/wishes.json')
+    fetch('/.netlify/functions/get-wishes')
       .then(r => r.ok ? r.json() : [])
       .then(d => { if (Array.isArray(d)) setList(d) })
       .catch(() => {})
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchWishes()
   }, [])
 
   const add = (e) => {
@@ -35,12 +41,11 @@ export default function WishBook() {
     })
       .then(r => {
         if (!r.ok) throw new Error('fail')
-        // Add to local list immediately for UI feedback
-        const newItem = { name, message, ts: Date.now() }
-        setList([newItem, ...list])
+        // Refresh the list from server after submission
+        fetchWishes()
         setName('')
         setMessage('')
-        alert('Cảm ơn lời chúc của bạn! ❤️')
+        setShowSuccess(true)
       })
       .catch((err) => {
         console.error('Error submitting wish:', err)
@@ -121,6 +126,19 @@ export default function WishBook() {
           </div>
         </div>
       </div>
+      
+      {showSuccess && createPortal(
+        <div className="invite-overlay">
+          <div className="card invite-modal p-6" style={{ maxWidth: 420, width: '90%' }}>
+            <h3 className="invite-title font-heading text-2xl">Cảm ơn bạn! ❤️</h3>
+            <p className="invite-message mt-2">Lời chúc của bạn đã được gửi thành công. Chúc bạn một ngày tuyệt vời!</p>
+            <div className="invite-actions">
+              <button className="btn-cta no-pulse" onClick={() => setShowSuccess(false)}>Đóng</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </section>
   )
 }
